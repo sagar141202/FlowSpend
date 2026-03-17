@@ -3,12 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { autoCrop } from "../utils/imageCrop";
 import { runOCR } from "../utils/ocr";
-import { parseReceipt } from "../utils/parser";
+import { type ParsedReceipt, parseReceipt } from "../utils/parser";
 import ReviewCard from "./ReviewCard";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [parsed, setParsed] = useState<any>(null);
+  const [parsed, setParsed] = useState<ParsedReceipt | null>(null);
   const [reviewMode, setReviewMode] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
   const scanAnim = useRef(new Animated.Value(0)).current;
@@ -42,7 +42,6 @@ export default function CameraScreen() {
 
     const croppedUri = await autoCrop(photo.uri);
     const raw = await runOCR(croppedUri);
-
     const parsedData = parseReceipt(raw);
 
     setParsed(parsedData);
@@ -78,6 +77,14 @@ export default function CameraScreen() {
         />
       </View>
 
+      {!reviewMode && (
+        <View style={styles.capture}>
+          <Text style={styles.button} onPress={captureAndScan}>
+            Scan
+          </Text>
+        </View>
+      )}
+
       {reviewMode && parsed && (
         <ReviewCard
           data={`₹${parsed.amount ?? "-"}\n${parsed.date ?? "-"}\n${parsed.merchant ?? "-"}`}
@@ -107,6 +114,20 @@ const styles = StyleSheet.create({
     width: 280,
     height: 2,
     backgroundColor: "#22C55E",
+  },
+  capture: {
+    position: "absolute",
+    bottom: 60,
+    width: "100%",
+    alignItems: "center",
+  },
+  button: {
+    backgroundColor: "#22C55E",
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 10,
+    color: "#000",
+    fontWeight: "600",
   },
   center: {
     flex: 1,
