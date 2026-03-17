@@ -1,14 +1,19 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
+import { categorize } from "../utils/categorizer";
 import { autoCrop } from "../utils/imageCrop";
 import { runOCR } from "../utils/ocr";
 import { type ParsedReceipt, parseReceipt } from "../utils/parser";
 import ReviewCard from "./ReviewCard";
 
+type ParsedWithCategory = ParsedReceipt & {
+  category: string;
+};
+
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [parsed, setParsed] = useState<ParsedReceipt | null>(null);
+  const [parsed, setParsed] = useState<ParsedWithCategory | null>(null);
   const [reviewMode, setReviewMode] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
   const scanAnim = useRef(new Animated.Value(0)).current;
@@ -44,7 +49,9 @@ export default function CameraScreen() {
     const raw = await runOCR(croppedUri);
     const parsedData = parseReceipt(raw);
 
-    setParsed(parsedData);
+    const category = categorize(parsedData.merchant);
+
+    setParsed({ ...parsedData, category });
     setReviewMode(true);
   };
 
@@ -87,7 +94,7 @@ export default function CameraScreen() {
 
       {reviewMode && parsed && (
         <ReviewCard
-          data={`₹${parsed.amount ?? "-"}\n${parsed.date ?? "-"}\n${parsed.merchant ?? "-"}`}
+          data={`₹${parsed.amount ?? "-"}\n${parsed.date ?? "-"}\n${parsed.merchant ?? "-"}\nCategory: ${parsed.category}`}
           onSave={handleSave}
           onDiscard={handleDiscard}
         />
