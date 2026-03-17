@@ -12,11 +12,17 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 
 type Props = {
   data: string;
+  confidence: number;
   onSave: () => void;
   onDiscard: () => void;
 };
 
-export default function ReviewCard({ data, onSave, onDiscard }: Props) {
+export default function ReviewCard({
+  data,
+  confidence,
+  onSave,
+  onDiscard,
+}: Props) {
   const pan = useRef(new Animated.ValueXY()).current;
 
   const panResponder = useRef(
@@ -48,11 +54,14 @@ export default function ReviewCard({ data, onSave, onDiscard }: Props) {
     }),
   ).current;
 
+  const isLow = confidence < 0.8;
+
   return (
     <View style={styles.container}>
       <Animated.View
         style={[
           styles.card,
+          isLow && { borderColor: "#EF4444", borderWidth: 2 },
           {
             transform: [
               { translateX: pan.x },
@@ -69,6 +78,11 @@ export default function ReviewCard({ data, onSave, onDiscard }: Props) {
         {...panResponder.panHandlers}
       >
         <Text style={styles.title}>Review</Text>
+
+        {isLow && (
+          <Text style={styles.warning}>Low confidence — please verify</Text>
+        )}
+
         <Text style={styles.text}>{data}</Text>
         <Text style={styles.hint}>Swipe → Save | ← Discard</Text>
       </Animated.View>
@@ -93,6 +107,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     color: "#22C55E",
+    marginBottom: 10,
+  },
+  warning: {
+    color: "#EF4444",
     marginBottom: 10,
   },
   text: {

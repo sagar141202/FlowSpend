@@ -95,6 +95,7 @@ export default function CameraScreen() {
       {reviewMode && parsed && (
         <ReviewCard
           data={`₹${parsed.amount ?? "-"}\n${parsed.date ?? "-"}\n${parsed.merchant ?? "-"}\nCategory: ${parsed.category}`}
+          confidence={parsed.confidence}
           onSave={handleSave}
           onDiscard={handleDiscard}
         />
