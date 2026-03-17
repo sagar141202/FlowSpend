@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import {
   Animated,
@@ -33,12 +34,14 @@ export default function ReviewCard({
       },
       onPanResponderRelease: (_, gesture) => {
         if (gesture.dx > 120) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           Animated.timing(pan, {
             toValue: { x: SCREEN_WIDTH, y: 0 },
             duration: 200,
             useNativeDriver: true,
           }).start(onSave);
         } else if (gesture.dx < -120) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
           Animated.timing(pan, {
             toValue: { x: -SCREEN_WIDTH, y: 0 },
             duration: 200,

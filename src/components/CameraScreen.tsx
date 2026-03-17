@@ -1,4 +1,5 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
+import * as Haptics from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { categorize } from "../utils/categorizer";
@@ -41,6 +42,8 @@ export default function CameraScreen() {
 
   const captureAndScan = async () => {
     if (!cameraRef.current) return;
+
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const photo = await cameraRef.current.takePictureAsync();
     if (!photo?.uri) return;
