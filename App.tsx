@@ -3,17 +3,17 @@ import {
   PlusJakartaSans_600SemiBold,
   useFonts,
 } from "@expo-google-fonts/plus-jakarta-sans";
-import * as SQLite from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import { Text, View } from "react-native";
-
-const _db = SQLite.openDatabaseSync("flowspend.db");
+import { useDatabase } from "./src/hooks/useDatabase";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_600SemiBold,
   });
+
+  useDatabase();
 
   if (!fontsLoaded) return null;
 
@@ -26,7 +26,7 @@ export default function App() {
           color: "#E2E8F0",
         }}
       >
-        SQLite Ready
+        DB Initialized
       </Text>
       <StatusBar style="light" />
     </View>
