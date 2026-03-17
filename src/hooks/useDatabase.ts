@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { getDatabase } from "../db/secureDb";
+import { seedCategories } from "../db/seed";
 
 export function useDatabase() {
   useEffect(() => {
@@ -35,8 +36,10 @@ export function useDatabase() {
             FOREIGN KEY (category_id) REFERENCES categories(id)
           );
         `);
+
+        seedCategories(db);
       } catch (e) {
-        console.log("DB secure init error", e);
+        console.log("DB init error", e);
       }
     })();
   }, []);
