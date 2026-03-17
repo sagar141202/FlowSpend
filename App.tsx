@@ -3,8 +3,11 @@ import {
   PlusJakartaSans_600SemiBold,
   useFonts,
 } from "@expo-google-fonts/plus-jakarta-sans";
+import * as SQLite from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import { Text, View } from "react-native";
+
+const _db = SQLite.openDatabaseSync("flowspend.db");
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -23,7 +26,7 @@ export default function App() {
           color: "#E2E8F0",
         }}
       >
-        FlowSpend
+        SQLite Ready
       </Text>
       <StatusBar style="light" />
     </View>
