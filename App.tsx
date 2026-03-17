@@ -1,5 +1,5 @@
-import CameraScreen from "./src/components/CameraScreen";
+import SkiaTest from "./src/components/SkiaTest";
 
 export default function App() {
-  return <CameraScreen />;
+  return <SkiaTest />;
 }
