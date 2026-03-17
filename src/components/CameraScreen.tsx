@@ -1,12 +1,14 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Button, StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, View } from "react-native";
 import { autoCrop } from "../utils/imageCrop";
 import { runOCR } from "../utils/ocr";
+import ReviewCard from "./ReviewCard";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [text, setText] = useState("");
+  const [reviewMode, setReviewMode] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
   const scanAnim = useRef(new Animated.Value(0)).current;
 
@@ -41,6 +43,17 @@ export default function CameraScreen() {
     const result = await runOCR(croppedUri);
 
     setText(result);
+    setReviewMode(true);
+  };
+
+  const handleSave = () => {
+    setReviewMode(false);
+    setText("");
+  };
+
+  const handleDiscard = () => {
+    setReviewMode(false);
+    setText("");
   };
 
   if (!permission?.granted) {
@@ -62,12 +75,17 @@ export default function CameraScreen() {
         />
       </View>
 
-      <View style={styles.bottom}>
-        <Button title="Scan" onPress={captureAndScan} />
-        <Text numberOfLines={2} style={{ color: "#fff" }}>
-          {text}
-        </Text>
-      </View>
+      {!reviewMode && (
+        <View style={styles.capture}>
+          <Text style={styles.button} onPress={captureAndScan}>
+            Scan
+          </Text>
+        </View>
+      )}
+
+      {reviewMode && (
+        <ReviewCard data={text} onSave={handleSave} onDiscard={handleDiscard} />
+      )}
     </View>
   );
 }
@@ -91,11 +109,19 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: "#22C55E",
   },
-  bottom: {
+  capture: {
     position: "absolute",
-    bottom: 40,
+    bottom: 60,
     width: "100%",
     alignItems: "center",
+  },
+  button: {
+    backgroundColor: "#22C55E",
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 10,
+    color: "#000",
+    fontWeight: "600",
   },
   center: {
     flex: 1,
