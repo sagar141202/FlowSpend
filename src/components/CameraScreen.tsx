@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { autoCrop } from "../utils/imageCrop";
 import { runOCR } from "../utils/ocr";
+import { parseReceipt } from "../utils/parser";
 import ReviewCard from "./ReviewCard";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [text, setText] = useState("");
+  const [parsed, setParsed] = useState<any>(null);
   const [reviewMode, setReviewMode] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
   const scanAnim = useRef(new Animated.Value(0)).current;
@@ -40,20 +41,22 @@ export default function CameraScreen() {
     if (!photo?.uri) return;
 
     const croppedUri = await autoCrop(photo.uri);
-    const result = await runOCR(croppedUri);
+    const raw = await runOCR(croppedUri);
 
-    setText(result);
+    const parsedData = parseReceipt(raw);
+
+    setParsed(parsedData);
     setReviewMode(true);
   };
 
   const handleSave = () => {
     setReviewMode(false);
-    setText("");
+    setParsed(null);
   };
 
   const handleDiscard = () => {
     setReviewMode(false);
-    setText("");
+    setParsed(null);
   };
 
   if (!permission?.granted) {
@@ -75,16 +78,12 @@ export default function CameraScreen() {
         />
       </View>
 
-      {!reviewMode && (
-        <View style={styles.capture}>
-          <Text style={styles.button} onPress={captureAndScan}>
-            Scan
-          </Text>
-        </View>
-      )}
-
-      {reviewMode && (
-        <ReviewCard data={text} onSave={handleSave} onDiscard={handleDiscard} />
+      {reviewMode && parsed && (
+        <ReviewCard
+          data={`₹${parsed.amount ?? "-"}\n${parsed.date ?? "-"}\n${parsed.merchant ?? "-"}`}
+          onSave={handleSave}
+          onDiscard={handleDiscard}
+        />
       )}
     </View>
   );
@@ -108,20 +107,6 @@ const styles = StyleSheet.create({
     width: 280,
     height: 2,
     backgroundColor: "#22C55E",
-  },
-  capture: {
-    position: "absolute",
-    bottom: 60,
-    width: "100%",
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: "#22C55E",
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 10,
-    color: "#000",
-    fontWeight: "600",
   },
   center: {
     flex: 1,
