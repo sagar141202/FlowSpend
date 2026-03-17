@@ -1,6 +1,7 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Button, StyleSheet, Text, View } from "react-native";
+import { autoCrop } from "../utils/imageCrop";
 import { runOCR } from "../utils/ocr";
 
 export default function CameraScreen() {
@@ -36,7 +37,9 @@ export default function CameraScreen() {
     const photo = await cameraRef.current.takePictureAsync();
     if (!photo?.uri) return;
 
-    const result = await runOCR(photo.uri);
+    const croppedUri = await autoCrop(photo.uri);
+    const result = await runOCR(croppedUri);
+
     setText(result);
   };
 
