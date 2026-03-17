@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "prepare": "husky"
   },
   "dependencies": {
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.7",
     "@types/react": "~18.2.79",
+    "husky": "^9.1.7",
     "typescript": "~5.3.3"
   },
   "private": true
